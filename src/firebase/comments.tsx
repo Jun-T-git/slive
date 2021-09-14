@@ -8,16 +8,17 @@ import {
   onSnapshot,
   query,
 } from "firebase/firestore";
+import { Comment } from "~/types/comment";
 
-type CommentHandler = (comment: string) => any;
-
+type CommentHandler = (comment: Comment) => any;
 export const observeCommentPost = (onPost: CommentHandler) => {
   const col = collection(db, "comments");
   const q = query(col);
   onSnapshot(q, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === "added") {
-        onPost(change.doc.data().content);
+        const comment = change.doc.data();
+        onPost({ content: comment.content, color: comment.color });
       }
     });
   });
@@ -31,7 +32,7 @@ export const deleteAllComments = async () => {
   });
 };
 
-export const postComment = async (comment: string) => {
+export const postComment = async ({ content, color }: Comment) => {
   const col = collection(db, "comments");
-  await addDoc(col, { content: comment });
+  await addDoc(col, { content: content, color: color });
 };
