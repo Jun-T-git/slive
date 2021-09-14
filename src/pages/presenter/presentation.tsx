@@ -1,9 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { deleteAllComments, observeCommentPost } from "~/firebase/comments";
+import { useRecoilValue } from "recoil";
+import { slideSrcState } from "~/recoil/atoms";
+import { Comment } from "~/types/comment";
 
-const Presenter: React.VFC = () => {
+const Presentation: React.VFC = () => {
   const count = useRef(0);
+  const slideSrc = useRecoilValue(slideSrcState);
 
   useEffect(() => {
     (async () => {
@@ -12,7 +16,7 @@ const Presenter: React.VFC = () => {
     })();
   }, []);
 
-  const createCommentElm = async (comment: string) => {
+  const createCommentElm = async (comment: Comment) => {
     count.current++;
     const div_comment = document.createElement("div");
     const div_wrapper = document.getElementById("commentWrapper");
@@ -22,20 +26,24 @@ const Presenter: React.VFC = () => {
     div_comment.style.left = document.documentElement.clientWidth + "px"; //初期状態の横方向の位置は画面の右端に設定
     var random = Math.round(Math.random() * div_wrapper.clientHeight * 0.3);
     div_comment.style.top = random + "px"; //初期状態の縦方向の位置は画面の上端から下端の間に設定（ランダムな配置に）
-    div_comment.appendChild(document.createTextNode(comment)); //画面上に表示されるテキストを設定
+    div_comment.appendChild(document.createTextNode(comment.content)); //画面上に表示されるテキストを設定
+    div_comment.style.color = comment.color;
     div_wrapper.appendChild(div_comment); //body直下へ挿入
-
     //ライブラリを用いたテキスト移動のアニメーション： durationはアニメーションの時間、
     //横方向の移動距離は「画面の横幅＋画面を流れるテキストの要素の横幅」、移動中に次の削除処理がされないようawait
     await gsap.to("#" + div_comment.id, {
-      duration: 5 - comment.length / 100,
+      duration: 5 - comment.content.length / 100,
       x: -1 * (document.documentElement.clientWidth + div_comment.clientWidth),
     });
 
     div_comment.parentNode.removeChild(div_comment); //画面上の移動終了後に削除
   };
 
-  return <div id="commentWrapper" className="w-80 h-80 mx-auto border-2"></div>;
+  return (
+    <div id="commentWrapper" className="mx-auto border-2">
+      <iframe src={slideSrc} className="w-screen h-screen" />
+    </div>
+  );
 };
 
-export default Presenter;
+export default Presentation;
