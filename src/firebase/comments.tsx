@@ -7,14 +7,15 @@ import {
   addDoc,
   onSnapshot,
   query,
+  Unsubscribe,
 } from "firebase/firestore";
 import { Comment } from "~/types/comment";
 
 type CommentHandler = (comment: Comment) => any;
-export const observeCommentPost = (onPost: CommentHandler) => {
+export const observeCommentPost = (onPost: CommentHandler): Unsubscribe => {
   const col = collection(db, "comments");
   const q = query(col);
-  onSnapshot(q, (snapshot) => {
+  return onSnapshot(q, (snapshot) => {
     snapshot.docChanges().forEach((change) => {
       if (change.type === "added") {
         const comment = change.doc.data();
