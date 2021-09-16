@@ -4,33 +4,51 @@ import { deleteAllComments, observeCommentPost } from "~/firebase/comments";
 import { useRecoilValue } from "recoil";
 import { slideSrcState } from "~/recoil/atoms";
 import { Comment } from "~/types/comment";
+import { Unsubscribe } from "@firebase/firestore";
 
 const Presentation: React.VFC = () => {
-  const count = useRef(0);
+  const count = useRef<number>(0);
+  const unsubscribeRef = useRef<Unsubscribe | null>(null);
   const slideSrc = useRecoilValue(slideSrcState);
 
   useEffect(() => {
     (async () => {
-      await deleteAllComments();
-      observeCommentPost((newComment) => createCommentElm(newComment));
+      await deleteAllComments(); // 入室前に送信されたコメントの削除
+      unsubscribeRef.current = observeCommentPost((newComment) =>
+        createCommentElm(newComment)
+      );
     })();
+    return () => {
+      deleteAllComments();
+      unsubscribeRef.current();
+    };
   }, []);
 
+  // コメントの表示
   const createCommentElm = async (comment: Comment) => {
     count.current++;
     const div_comment = document.createElement("div");
     const div_wrapper = document.getElementById("commentWrapper");
     div_comment.id = "text" + count.current; //アニメーション処理で対象の指定に必要なidを設定
-    div_comment.style.position = "fixed"; //テキストのは位置を絶対位置にするための設定
+    div_comment.style.position = "fixed";
     div_comment.style.whiteSpace = "nowrap"; //画面右端での折り返しがなく、画面外へはみ出すようにする
     div_comment.style.left = document.documentElement.clientWidth + "px"; //初期状態の横方向の位置は画面の右端に設定
     var random = Math.round(Math.random() * div_wrapper.clientHeight * 0.3);
-    div_comment.style.top = random + "px"; //初期状態の縦方向の位置は画面の上端から下端の間に設定（ランダムな配置に）
-    div_comment.appendChild(document.createTextNode(comment.content)); //画面上に表示されるテキストを設定
-    div_comment.style.color = comment.color;
-    div_wrapper.appendChild(div_comment); //body直下へ挿入
-    //ライブラリを用いたテキスト移動のアニメーション： durationはアニメーションの時間、
-    //横方向の移動距離は「画面の横幅＋画面を流れるテキストの要素の横幅」、移動中に次の削除処理がされないようawait
+    div_comment.style.top = random + "px"; //縦方向の位置
+
+    let commentChild;
+    if (comment.content.match(/^::.*::$/)) {
+      commentChild = document.createElement("img");
+      commentChild.src = `../images/${comment.content.slice(2, -2)}.png`;
+      div_comment.style.width = "30px";
+      div_comment.style.height = "30px";
+    } else {
+      commentChild = document.createTextNode(comment.content);
+      div_comment.style.color = comment.color; // 色設定
+      div_comment.style.fontSize = "24px";
+    }
+    div_comment.appendChild(commentChild);
+    div_wrapper.appendChild(div_comment);
     await gsap.to("#" + div_comment.id, {
       duration: 5 - comment.content.length / 100,
       x: -1 * (document.documentElement.clientWidth + div_comment.clientWidth),
