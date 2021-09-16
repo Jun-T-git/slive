@@ -8,11 +8,15 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
   return (
     <>
       <Head>
-        <title>Slive</title>
+        <title>SLive</title>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, user-scalable=no"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <RecoilRoot>
-        <main className="bg-blue-50 w-screen h-screen">
+        <main className="bg-[#112233] w-screen h-screen text-gray-100">
           <Component {...pageProps} />
         </main>
       </RecoilRoot>
