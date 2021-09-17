@@ -1,21 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
-import Link from "next/link";
 import { deleteAllComments, observeCommentPost } from "~/firebase/comments";
 import { useRecoilValue } from "recoil";
 import { slideSrcState } from "~/recoil/atoms";
 import { Comment } from "~/types/comment";
 import { Unsubscribe } from "@firebase/firestore";
+import ScreenMenu from "~/components/screenMenu";
 
 const Presentation: React.VFC = () => {
   const count = useRef<number>(0);
-  const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
   const unsubscribeRef = useRef<Unsubscribe | null>(null);
   const slideSrc = useRecoilValue(slideSrcState);
 
   useEffect(() => {
-    initFullScreen();
-
     (async () => {
       await deleteAllComments(); // 入室前に送信されたコメントの削除
       unsubscribeRef.current = observeCommentPost((newComment) =>
@@ -32,25 +29,6 @@ const Presentation: React.VFC = () => {
       })();
     };
   }, []);
-
-  const initFullScreen = () => {
-    const screenElm = document.getElementById("screen");
-    const fullScreenElm = document.fullscreenElement;
-    setIsFullScreen(!!fullScreenElm);
-    screenElm.onfullscreenchange = () => setIsFullScreen((prev) => !prev);
-    if (!fullScreenElm && slideSrc) {
-      console.log(screenElm);
-      screenElm.requestFullscreen();
-    }
-  };
-
-  const changeFullScreen = () => {
-    if (isFullScreen) {
-      document.exitFullscreen();
-    } else {
-      document.getElementById("screen").requestFullscreen();
-    }
-  };
 
   // コメントの表示
   const createCommentElm = async (comment: Comment) => {
@@ -87,20 +65,7 @@ const Presentation: React.VFC = () => {
 
   return (
     <div id="screen" className="mx-auto border-2">
-      <div className="bg-[#00000077] p-2 fixed z-30 flex space-x-5">
-        <Link href="/presenter/setting">
-          <a>
-            <img src="../exit.svg" className="w-10 h-10" />
-          </a>
-        </Link>
-        <button onClick={changeFullScreen}>
-          {isFullScreen ? (
-            <img src="../zoom_out.svg" className="w-10 h-10" />
-          ) : (
-            <img src="../zoom_in.svg" className="w-10 h-10" />
-          )}
-        </button>
-      </div>
+      <ScreenMenu />
       <iframe src={slideSrc} className="w-screen h-screen" />
     </div>
   );

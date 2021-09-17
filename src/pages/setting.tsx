@@ -38,7 +38,7 @@ const Setting: React.VFC = () => {
             Slide Preview
           </div>
         )}
-        <Link href={slideSrc ? "/presenter/presentation" : "#"}>
+        <Link href={slideSrc ? "/presentation" : "#"}>
           <a
             className={
               "block text-center w-full py-2 my-5 h-full text-white text-sm rounded " +
