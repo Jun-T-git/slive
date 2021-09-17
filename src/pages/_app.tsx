@@ -16,7 +16,7 @@ const MyApp = ({ Component, pageProps }: AppProps): ReactElement => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <RecoilRoot>
-        <main className="bg-[#112233] w-screen h-screen text-gray-100">
+        <main className="bg-[#112233] min-w-screen min-h-screen text-gray-100">
           <Component {...pageProps} />
         </main>
       </RecoilRoot>
