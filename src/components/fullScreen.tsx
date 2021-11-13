@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useRecoilValue } from "recoil";
-import { slideSrcState } from "~/recoil/atoms";
+import { slideSrcState } from "~/common/recoil/atoms";
 
 const FullScreen: React.VFC = () => {
   const slideSrc = useRecoilValue(slideSrcState);
@@ -30,11 +30,10 @@ const FullScreen: React.VFC = () => {
 
   return (
     <button onClick={changeFullScreen}>
-      {isFullScreen ? (
-        <img src="../zoom_out.svg" className="w-10 h-10" />
-      ) : (
-        <img src="../zoom_in.svg" className="w-10 h-10" />
-      )}
+      <img
+        src={isFullScreen ? "../zoom_out.svg" : "../zoom_in.svg"}
+        className="w-10 h-10"
+      />
     </button>
   );
 };

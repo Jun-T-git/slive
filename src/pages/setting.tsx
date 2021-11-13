@@ -1,11 +1,13 @@
-import React, { ChangeEvent } from "react";
-import Link from "next/link";
+import { useRouter } from "next/router";
+import React, { ChangeEvent, useState } from "react";
 import { useRecoilState } from "recoil";
-import { slideSrcState } from "~/recoil/atoms";
+import { createRoom } from "~/common/firebase/rooms";
+import { slideSrcState } from "~/common/recoil/atoms";
 import Header from "~/components/header";
 
 const Setting: React.VFC = () => {
   const [slideSrc, setSlideSrc] = useRecoilState(slideSrcState);
+  const router = useRouter();
 
   const handleTextareaChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     const slideLink = e.target.value;
@@ -13,14 +15,17 @@ const Setting: React.VFC = () => {
     setSlideSrc(slideEmbedSrc);
   };
 
+  const onClickButton = async () => {
+    const roomId = await createRoom();
+    router.push(`${roomId}/presentation`);
+  };
+
   return (
     <>
       <Header />
       <div className="p-5 mx-auto max-w-xl">
-        <h1 className="text-center text-2xl font-bold py-5">
-          スライドを設定する
-        </h1>
-        <p className="text-sm py-3">
+        <h1 className="text-center text-2xl font-bold py-5">ルーム設定</h1>
+        <p className="text-sm pt-7 pb-3">
           Googleスライドの [ファイル＞ウェブに公開＞リンク＞公開]
           で表示されるURLをコピーして貼り付けてください。
         </p>
@@ -38,16 +43,16 @@ const Setting: React.VFC = () => {
             Slide Preview
           </div>
         )}
-        <Link href={slideSrc ? "/presentation" : "#"}>
-          <a
-            className={
-              "block text-center w-full py-2 my-5 h-full text-white text-sm rounded " +
-              (slideSrc ? "bg-green-600" : "bg-gray-500")
-            }
-          >
-            スライドを設定する
-          </a>
-        </Link>
+        <button
+          className={
+            "block text-center w-full py-2 my-5 h-full text-white text-sm rounded " +
+            (slideSrc ? "bg-green-600" : "bg-gray-500")
+          }
+          disabled={!slideSrc}
+          onClick={onClickButton}
+        >
+          ルームを作成する
+        </button>
       </div>
     </>
   );

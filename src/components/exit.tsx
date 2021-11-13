@@ -1,6 +1,5 @@
 import React from "react";
 import { useRouter } from "next/router";
-import { cancelFullScreen } from "~/libs/cancelFullScreen";
 
 const Exit: React.VFC = () => {
   const router = useRouter();
@@ -8,6 +7,14 @@ const Exit: React.VFC = () => {
     await cancelFullScreen();
     router.push("/setting");
   };
+
+  // フルスクリーン状態なら解除
+  const cancelFullScreen = async () => {
+    if (document.fullscreenElement) {
+      await document.exitFullscreen();
+    }
+  };
+
   return (
     <button onClick={handleButtonClick}>
       <img src="../exit.svg" className="w-10 h-10" />
