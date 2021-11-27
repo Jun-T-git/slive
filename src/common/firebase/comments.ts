@@ -10,6 +10,7 @@ import {
   Unsubscribe,
 } from "firebase/firestore";
 import { Comment } from "~/types/comment";
+import { isRoomExist } from "./rooms";
 
 type CommentHandler = (comment: Comment) => any;
 
@@ -44,6 +45,9 @@ export const postComment = async (
   roomId: string,
   { content, color }: Comment
 ) => {
-  const col = collection(db, `/rooms/${roomId}/comments`);
-  await addDoc(col, { content: content, color: color });
+  const isEx = await isRoomExist(roomId);
+  if (isEx) {
+    const col = collection(db, `/rooms/${roomId}/comments`);
+    return await addDoc(col, { content: content, color: color });
+  }
 };

@@ -27,12 +27,14 @@ const Presentation: React.VFC = () => {
     }
 
     return () => {
-      if (roomId) {
-        if (unsubscribeRef.current) {
-          unsubscribeRef.current();
+      (async () => {
+        if (roomId) {
+          if (unsubscribeRef.current) {
+            unsubscribeRef.current();
+          }
+          console.log(await deleteRoom(roomId as string));
         }
-        deleteRoom(roomId as string);
-      }
+      })();
     };
   }, [roomId]);
 
