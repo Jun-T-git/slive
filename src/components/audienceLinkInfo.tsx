@@ -7,9 +7,13 @@ const AudienceLinkInfo: React.VFC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const router = useRouter();
   const roomId = router.query.roomId as string;
+  const audienceUrl =
+    process.env.NODE_ENV === "production"
+      ? `https://slive-xi.vercel.app/${roomId}/audience`
+      : `http://localhost:3000/${roomId}/audience`;
 
   const { inputRef } = useQRCode<HTMLImageElement>({
-    text: `https://slive-xi.vercel.app/${roomId}/audience`,
+    text: audienceUrl,
     options: {
       type: "image/jpeg",
       quality: 0.3,
@@ -38,7 +42,7 @@ const AudienceLinkInfo: React.VFC = () => {
           <img ref={inputRef} className="mx-auto" />
           <input
             type="text"
-            value={`https://slive-xi.vercel.app/${roomId}/audience`}
+            value={audienceUrl}
             onFocus={(e) => e.target.select()}
             readOnly={true}
             className="text-black bg-gray-200 w-full p-1 my-5 h-full border text-lg rounded"
