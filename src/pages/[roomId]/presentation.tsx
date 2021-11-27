@@ -1,34 +1,40 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
-import { deleteAllComments, observeCommentPost } from "~/firebase/comments";
+import { observeCommentPost } from "~/common/firebase/comments";
 import { useRecoilValue } from "recoil";
-import { slideSrcState } from "~/recoil/atoms";
+import { slideSrcState } from "~/common/recoil/atoms";
 import { Comment } from "~/types/comment";
 import { Unsubscribe } from "@firebase/firestore";
 import ScreenMenu from "~/components/screenMenu";
+import { useRouter } from "next/router";
+import { deleteRoom } from "~/common/firebase/rooms";
 
 const Presentation: React.VFC = () => {
   const count = useRef<number>(0);
   const unsubscribeRef = useRef<Unsubscribe | null>(null);
   const slideSrc = useRecoilValue(slideSrcState);
+  const router = useRouter();
+  const { roomId } = router.query;
 
   useEffect(() => {
-    (async () => {
-      await deleteAllComments(); // 入室前に送信されたコメントの削除
-      unsubscribeRef.current = observeCommentPost((newComment) =>
-        createCommentElm(newComment)
-      );
-    })();
+    if (roomId) {
+      (async () => {
+        unsubscribeRef.current = observeCommentPost(
+          roomId as string,
+          (newComment) => createCommentElm(newComment)
+        );
+      })();
+    }
 
     return () => {
-      (async () => {
-        await deleteAllComments();
+      if (roomId) {
         if (unsubscribeRef.current) {
           unsubscribeRef.current();
         }
-      })();
+        deleteRoom(roomId as string);
+      }
     };
-  }, []);
+  }, [roomId]);
 
   // コメントの表示
   const createCommentElm = async (comment: Comment) => {
@@ -56,7 +62,7 @@ const Presentation: React.VFC = () => {
     div_comment.appendChild(commentChild);
     div_wrapper.appendChild(div_comment);
     await gsap.to("#" + div_comment.id, {
-      duration: 5 - comment.content.length / 100,
+      duration: 6 - comment.content.length / 100,
       x: -1 * (document.documentElement.clientWidth + div_comment.clientWidth),
     });
 

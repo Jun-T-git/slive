@@ -1,8 +1,33 @@
+import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useQRCode } from "next-qrcode";
 import Modal from "~/components/modal";
 
 const AudienceLinkInfo: React.VFC = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const router = useRouter();
+  const roomId = router.query.roomId as string;
+  const audienceUrl =
+    process.env.NODE_ENV === "production"
+      ? `https://slive-xi.vercel.app/${roomId}/audience`
+      : `http://localhost:3000/${roomId}/audience`;
+
+  const { inputRef } = useQRCode<HTMLImageElement>({
+    text: audienceUrl,
+    options: {
+      type: "image/jpeg",
+      quality: 0.3,
+      level: "M",
+      margin: 1,
+      scale: 1,
+      width: 200,
+      color: {
+        dark: "#000000",
+        light: "#FFFFFF",
+      },
+    },
+  });
+
   return (
     <>
       <button onClick={() => setIsOpen(true)}>
@@ -14,10 +39,10 @@ const AudienceLinkInfo: React.VFC = () => {
         isOpen={isOpen}
       >
         <div className="text-center max-w-lg mx-auto">
-          <img src="../qrcode.png" className="w-52 h-52 mx-auto" />
+          <img ref={inputRef} className="mx-auto" />
           <input
             type="text"
-            value="https://slive-xi.vercel.app/audience"
+            value={audienceUrl}
             onFocus={(e) => e.target.select()}
             readOnly={true}
             className="text-black bg-gray-200 w-full p-1 my-5 h-full border text-lg rounded"

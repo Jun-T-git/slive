@@ -1,16 +1,22 @@
+import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { postComment } from "~/firebase/comments";
+import { postComment } from "~/common/firebase/comments";
 
 type Props = {
+  roomId: string;
   code: string;
 };
 
-const Stamp: React.VFC<Props> = ({ code }) => {
+const Stamp: React.VFC<Props> = ({ roomId, code }) => {
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const router = useRouter();
 
   const handleButtonClick = () => {
     setIsDisabled(true); // 連打防止
-    postComment({ content: `::${code}::`, color: "" });
+    postComment(roomId, {
+      content: `::${code}::`,
+      color: "",
+    });
     setTimeout(() => setIsDisabled(false), 500);
   };
 
