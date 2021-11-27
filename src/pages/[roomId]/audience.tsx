@@ -31,8 +31,8 @@ const Audience: React.VFC = () => {
     }
   };
 
-  const HandleButtonClick = () => {
-    postComment(roomId as string, {
+  const HandleButtonClick = async () => {
+    await postComment(roomId as string, {
       content: inputComment,
       color: commentColor,
     });
