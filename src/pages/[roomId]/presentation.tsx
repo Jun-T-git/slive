@@ -1,9 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
-import {
-  deleteAllComments,
-  observeCommentPost,
-} from "~/common/firebase/comments";
+import { observeCommentPost } from "~/common/firebase/comments";
 import { useRecoilValue } from "recoil";
 import { slideSrcState } from "~/common/recoil/atoms";
 import { Comment } from "~/types/comment";
@@ -30,15 +27,12 @@ const Presentation: React.VFC = () => {
     }
 
     return () => {
-      (async () => {
-        if (roomId) {
-          if (unsubscribeRef.current) {
-            unsubscribeRef.current();
-          }
-          // await deleteAllComments(roomId as string);
-          await deleteRoom(roomId as string);
+      if (roomId) {
+        if (unsubscribeRef.current) {
+          unsubscribeRef.current();
         }
-      })();
+        deleteRoom(roomId as string);
+      }
     };
   }, [roomId]);
 
@@ -68,7 +62,7 @@ const Presentation: React.VFC = () => {
     div_comment.appendChild(commentChild);
     div_wrapper.appendChild(div_comment);
     await gsap.to("#" + div_comment.id, {
-      duration: 5 - comment.content.length / 100,
+      duration: 6 - comment.content.length / 100,
       x: -1 * (document.documentElement.clientWidth + div_comment.clientWidth),
     });
 
