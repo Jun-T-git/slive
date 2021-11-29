@@ -36,7 +36,7 @@ export const deleteAllComments = async (roomId: string) => {
   const col = collection(db, `/rooms/${roomId}/comments`);
   const querySnapshot = await getDocs(col);
   querySnapshot.forEach((document) => {
-    deleteDoc(doc(db, `${document.id}`));
+    deleteDoc(doc(db, `/rooms/${roomId}/comments/${document.id}`));
   });
 };
 

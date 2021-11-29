@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { observeCommentPost } from "~/common/firebase/comments";
 import { useRecoilValue } from "recoil";
@@ -14,14 +14,13 @@ const Presentation: React.VFC = () => {
   const unsubscribeRef = useRef<Unsubscribe | null>(null);
   const slideSrc = useRecoilValue(slideSrcState);
   const router = useRouter();
-  const { roomId } = router.query;
+  const roomId = router.query.roomId as string;
 
   useEffect(() => {
     if (roomId) {
       (async () => {
-        unsubscribeRef.current = observeCommentPost(
-          roomId as string,
-          (newComment) => createCommentElm(newComment)
+        unsubscribeRef.current = observeCommentPost(roomId, (newComment) =>
+          createCommentElm(newComment)
         );
       })();
     }
@@ -32,11 +31,11 @@ const Presentation: React.VFC = () => {
           if (unsubscribeRef.current) {
             unsubscribeRef.current();
           }
-          console.log(await deleteRoom(roomId as string));
+          await deleteRoom(roomId);
         }
       })();
     };
-  }, [roomId]);
+  }, []);
 
   // コメントの表示
   const createCommentElm = async (comment: Comment) => {

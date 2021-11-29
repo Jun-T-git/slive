@@ -6,10 +6,12 @@ import {
   setDoc,
   getDocs,
 } from "firebase/firestore";
+import { deleteAllComments } from "./comments";
 
 // roomIdで指定したルームを削除する
 export const deleteRoom = async (roomId: string) => {
-  await deleteDoc(doc(db, "rooms", roomId));
+  await deleteAllComments(roomId);
+  await deleteDoc(doc(db, `rooms/${roomId}`));
 };
 
 // ルームを新規作成し，roomIdを返す
@@ -22,7 +24,7 @@ export const createRoom = async () => {
 
 // roomIdで指定したルームが存在するか
 export const isRoomExist = async (roomId: string) => {
-  const col = collection(db, `rooms`);
+  const col = collection(db, "rooms");
   const querySnapshot = await getDocs(col);
   let isExist = false;
   querySnapshot.forEach((document) => {
